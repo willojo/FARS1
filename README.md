@@ -1,2 +1,2 @@
-# FARS1
-COURSERA : Building an R Package
+# COURSERA : Building an R Package
+
