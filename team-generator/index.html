@@ -1,201 +1,307 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Random Team Generator</title>
-  <style>
-    :root {
-      --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #5d6677;
-      --border: #d9dde4; --accent: #2f6fdd; --accent-text: #ffffff;
-      --error-bg: #fdecec; --error-text: #a12626; --warn-bg: #fff6e0; --warn-text: #7a5a00;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ARTIFACT-START -->
+<title>Random Team Generator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  /* Layout: one column — a form panel on top, a wrapping grid of team cards below. */
+  :root {
+    --bg: #f3f5f2; --panel: #ffffff; --fg: #1b231d; --muted: #5a6a5e;
+    --line: #d5ddd6; --accent: #1f7a4d; --accent-fg: #ffffff;
+    --warn-bg: #fff4d6; --warn-fg: #6f5200; --err-bg: #fde8e6; --err-fg: #9b2418;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121713; --panel: #1a211c; --fg: #e4ebe5; --muted: #98a89c;
+      --line: #2e3a31; --accent: #4fc289; --accent-fg: #0b1a12;
+      --warn-bg: #3a3116; --warn-fg: #f1d68b; --err-bg: #3d1d1a; --err-fg: #f4aaa1;
+      color-scheme: dark;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #14171c; --card: #1d2128; --text: #e7eaf0; --muted: #9aa3b2;
-        --border: #333a45; --accent: #5b8ff0; --accent-text: #0d1117;
-        --error-bg: #3a1c1c; --error-text: #f2a6a6; --warn-bg: #3a3118; --warn-text: #f0d48a;
-      }
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--text);
-      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    }
-    main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
-    h1 { margin: 0 0 4px; font-size: 1.75rem; }
-    .lead { margin: 0 0 24px; color: var(--muted); }
-    .card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 10px; padding: 20px;
-    }
-    label { display: block; font-weight: 600; margin-bottom: 6px; }
-    .hint { font-weight: 400; color: var(--muted); font-size: 0.875rem; }
-    textarea, input {
-      width: 100%; padding: 10px 12px; font: inherit; color: var(--text);
-      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-    }
-    textarea { min-height: 200px; resize: vertical; }
-    textarea:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 20px; }
-    button {
-      font: inherit; font-weight: 600; padding: 10px 18px; border-radius: 8px;
-      border: 1px solid var(--accent); background: var(--accent); color: var(--accent-text); cursor: pointer;
-    }
-    button.secondary { background: transparent; color: var(--accent); }
-    button:disabled { opacity: 0.5; cursor: default; }
-    .count { color: var(--muted); font-size: 0.875rem; margin-left: auto; }
-    .msg { margin-top: 16px; padding: 10px 12px; border-radius: 8px; }
-    .msg.error { background: var(--error-bg); color: var(--error-text); }
-    .msg.warn { background: var(--warn-bg); color: var(--warn-text); }
-    .teams {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px; margin-top: 24px;
-    }
-    .team h2 { margin: 0 0 8px; font-size: 1.05rem; display: flex; justify-content: space-between; }
-    .team h2 span { color: var(--muted); font-weight: 400; font-size: 0.875rem; }
-    .team ol { margin: 0; padding-left: 22px; }
-    .team.unassigned { border-style: dashed; }
-    [hidden] { display: none !important; }
-    @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
-  </style>
-</head>
-<body>
-  <main>
+  }
+  :root[data-theme="dark"] {
+    --bg: #121713; --panel: #1a211c; --fg: #e4ebe5; --muted: #98a89c;
+    --line: #2e3a31; --accent: #4fc289; --accent-fg: #0b1a12;
+    --warn-bg: #3a3116; --warn-fg: #f1d68b; --err-bg: #3d1d1a; --err-fg: #f4aaa1;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 var(--body); }
+  main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; display: grid; gap: 24px; }
+  header h1 { margin: 0; font: 800 clamp(1.75rem, 4vw, 2.25rem)/1.1 var(--display); text-wrap: balance; }
+  header p { margin: 6px 0 0; color: var(--muted); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 16px; }
+  label { display: block; font-weight: 700; margin-bottom: 6px; }
+  .hint { font-weight: 400; color: var(--muted); font-size: 0.875rem; margin: 0; }
+  textarea, input {
+    width: 100%; padding: 10px 12px; font: inherit; color: var(--fg);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  }
+  textarea { min-height: 180px; resize: vertical; }
+  textarea:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  button {
+    font: inherit; font-weight: 700; padding: 10px 18px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg);
+  }
+  button.secondary { background: transparent; color: var(--accent); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .count { color: var(--muted); font-size: 0.875rem; margin-left: auto; font-variant-numeric: tabular-nums; }
+  .msg { padding: 10px 12px; border-radius: 8px; margin: 0; }
+  .msg.warn { background: var(--warn-bg); color: var(--warn-fg); }
+  .msg.error { background: var(--err-bg); color: var(--err-fg); }
+  .teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .team { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+  .team h2 { margin: 0 0 8px; font: 600 1.15rem/1.3 var(--display); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .team h2 span { color: var(--muted); font: 400 0.8125rem var(--body); font-variant-numeric: tabular-nums; }
+  .team ol { margin: 0; padding-left: 22px; overflow-wrap: anywhere; }
+  .team.unassigned { border-style: dashed; background: transparent; }
+  @media (max-width: 520px) { .row { grid-template-columns: 1fr; } .count { margin-left: 0; } }
+</style>
+
+<main>
+  <header>
     <h1>Random Team Generator</h1>
-    <p class="lead">Paste a list of names, choose the team size and number of teams, and shuffle.</p>
+    <p>Enter names, choose the team size and number of teams, then shuffle.</p>
+  </header>
 
-    <form id="form" class="card" novalidate>
-      <label for="names">Names <span class="hint">— one per line, or separated by commas</span></label>
-      <textarea id="names" placeholder="Ada&#10;Grace&#10;Linus&#10;Margaret"></textarea>
+  <form id="form" class="panel" novalidate>
+    <div>
+      <label for="names">Names</label>
+      <textarea id="names">Ada
+Grace
+Linus
+Margaret
+Alan
+Ken
+Barbara
+Dennis
+Tim
+Bjarne
+Guido
+Radia</textarea>
+      <p class="hint" id="namesHint">One per line, or separated by commas. The names above are a sample; replace them with your own.</p>
+    </div>
 
-      <div class="row">
-        <div>
-          <label for="size">Persons per team</label>
-          <input id="size" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 3">
-        </div>
-        <div>
-          <label for="count">Number of teams</label>
-          <input id="count" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 4">
-        </div>
+    <div class="row">
+      <div>
+        <label for="size">Persons per team</label>
+        <input id="size" type="number" min="1" step="1" inputmode="numeric" value="3">
       </div>
-      <p class="hint">Leave one of the two numbers blank and it will be worked out for you.</p>
-
-      <div class="actions">
-        <button type="submit">Generate teams</button>
-        <button type="button" id="copy" class="secondary" disabled>Copy results</button>
-        <button type="button" id="clear" class="secondary">Clear</button>
-        <span id="nameCount" class="count">0 names</span>
+      <div>
+        <label for="count">Number of teams</label>
+        <input id="count" type="number" min="1" step="1" inputmode="numeric" value="4">
       </div>
+    </div>
+    <p class="hint">Leave one of the two numbers blank and it is worked out from the other.</p>
 
-      <div id="message" class="msg" role="alert" hidden></div>
-    </form>
+    <div class="actions">
+      <button type="submit">Generate teams</button>
+      <button type="button" id="copy" class="secondary" disabled>Copy results</button>
+      <button type="button" id="clear" class="secondary">Clear</button>
+      <span id="nameCount" class="count">0 names</span>
+    </div>
 
-    <section id="results" class="teams" aria-live="polite"></section>
-  </main>
+    <p id="message" class="msg" role="alert" hidden></p>
+  </form>
 
-  <script src="teams.js"></script>
-  <script>
-    (function () {
-      var TG = window.TeamGenerator;
-      var form = document.getElementById("form");
-      var namesEl = document.getElementById("names");
-      var sizeEl = document.getElementById("size");
-      var countEl = document.getElementById("count");
-      var msgEl = document.getElementById("message");
-      var resultsEl = document.getElementById("results");
-      var copyBtn = document.getElementById("copy");
-      var nameCountEl = document.getElementById("nameCount");
-      var lastText = "";
+  <section id="results" class="teams" aria-live="polite"></section>
+</main>
 
-      function showMessage(text, kind) {
-        msgEl.textContent = text;
-        msgEl.className = "msg " + kind;
-        msgEl.hidden = !text;
+<script id="team-logic">
+  // Core logic. Kept in its own script block so test.js can load it.
+  var TeamGenerator = (function () {
+    "use strict";
+
+    function parseNames(text) {
+      return String(text || "")
+        .split(/[\n,;]+/)
+        .map(function (n) { return n.trim(); })
+        .filter(function (n) { return n.length > 0; });
+    }
+
+    function randomInt(max) {
+      var c = typeof crypto !== "undefined" ? crypto : null;
+      if (c && c.getRandomValues) {
+        var buf = new Uint32Array(1);
+        c.getRandomValues(buf);
+        return buf[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    function shuffle(list) {
+      var a = list.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = randomInt(i + 1);
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
+    function toPositiveInt(value) {
+      if (value === null || value === undefined || value === "") return null;
+      var n = Number(value);
+      if (!Number.isInteger(n) || n < 1) return NaN;
+      return n;
+    }
+
+    // Splits `names` into random teams.
+    // - teamCount and teamSize may each be omitted; the missing one is derived.
+    // - Members are dealt round-robin so team sizes differ by at most one.
+    // - If teamCount * teamSize is smaller than the number of names, the
+    //   extra people are returned in `unassigned`.
+    function generateTeams(names, teamSize, teamCount) {
+      var size = toPositiveInt(teamSize);
+      var count = toPositiveInt(teamCount);
+
+      if (!names || names.length === 0) throw new Error("Enter at least one name.");
+      if (Number.isNaN(size)) throw new Error("Persons per team must be a whole number of at least 1.");
+      if (Number.isNaN(count)) throw new Error("Number of teams must be a whole number of at least 1.");
+      if (size === null && count === null) throw new Error("Enter persons per team, number of teams, or both.");
+
+      if (count === null) count = Math.ceil(names.length / size);
+      if (size === null) size = Math.ceil(names.length / count);
+
+      var shuffled = shuffle(names);
+      var capacity = size * count;
+      var placed = shuffled.slice(0, capacity);
+      var unassigned = shuffled.slice(capacity);
+
+      var teams = [];
+      for (var t = 0; t < count; t++) teams.push([]);
+      placed.forEach(function (name, i) { teams[i % count].push(name); });
+
+      return { teams: teams, unassigned: unassigned, teamSize: size, teamCount: count };
+    }
+
+    return { parseNames: parseNames, shuffle: shuffle, generateTeams: generateTeams };
+  })();
+</script>
+
+<script>
+  (function () {
+    var TG = TeamGenerator;
+    var form = document.getElementById("form");
+    var namesEl = document.getElementById("names");
+    var sizeEl = document.getElementById("size");
+    var countEl = document.getElementById("count");
+    var msgEl = document.getElementById("message");
+    var resultsEl = document.getElementById("results");
+    var copyBtn = document.getElementById("copy");
+    var nameCountEl = document.getElementById("nameCount");
+    var lastText = "";
+
+    function showMessage(text, kind) {
+      msgEl.textContent = text;
+      msgEl.className = "msg " + kind;
+      msgEl.hidden = !text;
+    }
+
+    function updateCount() {
+      var n = TG.parseNames(namesEl.value).length;
+      nameCountEl.textContent = n + (n === 1 ? " name" : " names");
+    }
+
+    function renderTeam(title, members, extraClass) {
+      var card = document.createElement("article");
+      card.className = "team" + (extraClass ? " " + extraClass : "");
+      var h = document.createElement("h2");
+      h.textContent = title;
+      var badge = document.createElement("span");
+      badge.textContent = members.length + (members.length === 1 ? " person" : " people");
+      h.appendChild(badge);
+      card.appendChild(h);
+      var list = document.createElement("ol");
+      members.forEach(function (m) {
+        var li = document.createElement("li");
+        li.textContent = m;
+        list.appendChild(li);
+      });
+      card.appendChild(list);
+      return card;
+    }
+
+    function generate() {
+      resultsEl.innerHTML = "";
+      copyBtn.disabled = true;
+      lastText = "";
+
+      var result;
+      try {
+        result = TG.generateTeams(TG.parseNames(namesEl.value), sizeEl.value, countEl.value);
+      } catch (err) {
+        showMessage(err.message, "error");
+        return;
       }
 
-      function updateCount() {
-        var n = TG.parseNames(namesEl.value).length;
-        nameCountEl.textContent = n + (n === 1 ? " name" : " names");
+      var lines = [];
+      result.teams.forEach(function (members, i) {
+        var title = "Team " + (i + 1);
+        resultsEl.appendChild(renderTeam(title, members));
+        lines.push(title + ": " + (members.length ? members.join(", ") : "(empty)"));
+      });
+      if (result.unassigned.length) {
+        resultsEl.appendChild(renderTeam("Not assigned", result.unassigned, "unassigned"));
+        lines.push("Not assigned: " + result.unassigned.join(", "));
       }
 
-      function renderTeam(title, members, extraClass) {
-        var card = document.createElement("article");
-        card.className = "card team" + (extraClass ? " " + extraClass : "");
-        var h = document.createElement("h2");
-        h.textContent = title;
-        var badge = document.createElement("span");
-        badge.textContent = members.length + (members.length === 1 ? " person" : " people");
-        h.appendChild(badge);
-        card.appendChild(h);
-        var list = document.createElement("ol");
-        members.forEach(function (m) {
-          var li = document.createElement("li");
-          li.textContent = m;
-          list.appendChild(li);
-        });
-        card.appendChild(list);
-        return card;
+      var warnings = [];
+      if (result.unassigned.length) {
+        warnings.push(result.unassigned.length + " name(s) did not fit into " + result.teamCount +
+          " team(s) of " + result.teamSize + ".");
       }
+      var empty = result.teams.filter(function (t) { return t.length === 0; }).length;
+      if (empty) warnings.push(empty + " team(s) are empty because there are not enough names.");
+      showMessage(warnings.join(" "), "warn");
 
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        resultsEl.innerHTML = "";
-        copyBtn.disabled = true;
-        lastText = "";
+      lastText = lines.join("\n");
+      copyBtn.disabled = false;
+    }
 
-        var result;
-        try {
-          result = TG.generateTeams(TG.parseNames(namesEl.value), sizeEl.value, countEl.value);
-        } catch (err) {
-          showMessage(err.message, "error");
-          return;
-        }
+    function copyFallback() {
+      var ta = document.createElement("textarea");
+      ta.value = lastText;
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      return ok;
+    }
 
-        var lines = [];
-        result.teams.forEach(function (members, i) {
-          var title = "Team " + (i + 1);
-          resultsEl.appendChild(renderTeam(title, members));
-          lines.push(title + ": " + (members.length ? members.join(", ") : "(empty)"));
-        });
-        if (result.unassigned.length) {
-          resultsEl.appendChild(renderTeam("Not assigned", result.unassigned, "unassigned"));
-          lines.push("Not assigned: " + result.unassigned.join(", "));
-        }
+    function copied() {
+      copyBtn.textContent = "Copied";
+      setTimeout(function () { copyBtn.textContent = "Copy results"; }, 1500);
+    }
 
-        var warnings = [];
-        if (result.unassigned.length) {
-          warnings.push(result.unassigned.length + " name(s) did not fit into " + result.teamCount +
-            " team(s) of " + result.teamSize + ".");
-        }
-        var empty = result.teams.filter(function (t) { return t.length === 0; }).length;
-        if (empty) warnings.push(empty + " team(s) are empty because there are not enough names.");
-        showMessage(warnings.join(" "), "warn");
+    form.addEventListener("submit", function (e) { e.preventDefault(); generate(); });
 
-        lastText = lines.join("\n");
-        copyBtn.disabled = false;
+    copyBtn.addEventListener("click", function () {
+      if (!lastText) return;
+      var p = navigator.clipboard && navigator.clipboard.writeText
+        ? navigator.clipboard.writeText(lastText) : Promise.reject();
+      p.then(copied, function () {
+        if (copyFallback()) copied();
+        else showMessage("Your browser blocked copying. Select the team names and copy them manually.", "error");
       });
+    });
 
-      copyBtn.addEventListener("click", function () {
-        if (!lastText) return;
-        navigator.clipboard.writeText(lastText).then(function () {
-          copyBtn.textContent = "Copied!";
-          setTimeout(function () { copyBtn.textContent = "Copy results"; }, 1500);
-        }, function () {
-          showMessage("Could not copy to the clipboard.", "error");
-        });
-      });
+    document.getElementById("clear").addEventListener("click", function () {
+      namesEl.value = ""; sizeEl.value = ""; countEl.value = "";
+      resultsEl.innerHTML = ""; copyBtn.disabled = true; lastText = "";
+      showMessage("", "warn"); updateCount(); namesEl.focus();
+    });
 
-      document.getElementById("clear").addEventListener("click", function () {
-        namesEl.value = ""; sizeEl.value = ""; countEl.value = "";
-        resultsEl.innerHTML = ""; copyBtn.disabled = true; lastText = "";
-        showMessage("", "warn"); updateCount(); namesEl.focus();
-      });
-
-      namesEl.addEventListener("input", updateCount);
-      updateCount();
-    })();
-  </script>
-</body>
+    namesEl.addEventListener("input", updateCount);
+    updateCount();
+    generate();
+  })();
+</script>
+<!-- ARTIFACT-END -->
 </html>

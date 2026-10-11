@@ -1,6 +1,11 @@
 // Run with: node test.js
 const assert = require("assert");
-const { parseNames, generateTeams } = require("./teams.js");
+const fs = require("fs");
+
+// Load the logic straight from the <script id="team-logic"> block in index.html.
+const html = fs.readFileSync(__dirname + "/index.html", "utf8");
+const code = html.match(/<script id="team-logic">([\s\S]*?)<\/script>/)[1];
+const { parseNames, generateTeams } = new Function(code + "\nreturn TeamGenerator;")();
 
 const names = parseNames("A\nB, C;D\n\n  E  \nF\nG\nH\nI\nJ");
 assert.deepStrictEqual(names, ["A","B","C","D","E","F","G","H","I","J"]);

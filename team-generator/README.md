@@ -4,7 +4,11 @@ A small browser app that splits a list of names into random teams.
 
 ## Usage
 
-Open `index.html` in any browser (no install or server needed).
+Open `index.html` in any browser (no install or server needed). The page is a
+single self-contained file, so you can download just `index.html` and open it.
+
+Note: clicking `index.html` on GitHub only shows its source code. Download the
+file (the "Download raw file" button) and double-click it to open it in a browser.
 
 1. Enter names, one per line or separated by commas/semicolons.
 2. Set **Persons per team** and **Number of teams**. You can leave one blank
